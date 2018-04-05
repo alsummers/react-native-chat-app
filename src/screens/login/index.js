@@ -3,7 +3,7 @@ import firebase from 'firebase'
 import { Text, TextInput, TouchableHighlight, View } from 'react-native'
 import styles from './styles'
 
-export default class Landing extends React.Component {
+export default class Login extends React.Component {
 
     constructor (props) {
         super(props)
@@ -16,25 +16,24 @@ export default class Landing extends React.Component {
             username: '',
         }
     }
-    signup() {
+    signup = () => {
         if(this.state.signupPassword == this.state.signupConfirmPassword){
-            firebase.auth().createUserAndRetrieveDataWithEmailAndPassword(this.state.signupEmail, this.state.signupPassword)
+            firebase.auth().createUserWithEmailAndPassword(this.state.signupEmail, this.state.signupPassword)
             .then(res => {
                 let uid = res.uid
                 let userInfo = {
                     username: this.state.signupUsername
                 }
                 firebase.database().ref('userInformation/').child(uid).set(userInfo)
-                this.props.navigation.navigate('FinishProfile')
             }).catch(res => {
                 console.log('error', res)
             })
         }
     }
-    signin() {
+    signin = () => {
         firebase.auth().signInWithEmailAndPassword(this.state.signinEmail, this.state.signinPassword)
         .then(res => {
-            this.props.navigation.navigate('FinishProfile')
+            
         }).catch(res => {
             console.log('error', res.code)
         })

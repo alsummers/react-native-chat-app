@@ -12,7 +12,6 @@ const Home = TabNavigator(
   },
   {
     tabBarPosition: "bottom",
-    initialRouteName: "Channels"
   }
 );
 

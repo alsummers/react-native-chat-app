@@ -2,6 +2,7 @@ import React from 'react'
 import { View, Text, Image, TouchableHighlight } from 'react-native'
 import { ImagePicker } from 'expo'
 import styles from './styles'
+import firebase from 'firebase'
 
 export default class FinishProfile extends React.Component {
 
@@ -10,7 +11,9 @@ export default class FinishProfile extends React.Component {
         this.state={
             image: ''
         }
+        this.uid = this.props.navigation.state.params.uid
     }
+
     takePhoto = async () => {
         let pickerResult = await ImagePicker.launchCameraAsync({
             allowsEditing: true,
@@ -27,16 +30,27 @@ export default class FinishProfile extends React.Component {
             if(!pickerResult.cancelled) {
                 this.setState({image: pickerResult.uri})
             }
+        
     }
     uploadButtonPressed = async () => {
         let uploadResponse, uploadResult;
+        let uid = this.uid
     
         try {
             uploadResponse = await this.uploadPhoto(this.state.image);
+            console.log(this.state.image)
             uploadResult = await uploadResponse.json();
             let imageUrl = JSON.stringify(uploadResult.location)
+            imageUrl = imageUrl.replace(/"/g,'')
             console.log({ uploadResponse });
             console.log({ uploadResult });
+            firebase.database().ref('userInformation').child(uid).child('profImage').set(imageUrl)
+.then(() => {
+
+    this.props.navigation.navigate('Home', {uid} )
+    
+
+})
     
         } catch (e) {
             console.log({ uploadResponse });
@@ -46,7 +60,7 @@ export default class FinishProfile extends React.Component {
         };
     }
     uploadPhoto = async(uri) => {
-        let apiUrl = 'your url from the last module here';
+        let apiUrl = 'https://file-upload-example-backend-dhfjhadnlo.now.sh/upload';
     
         let uriParts = uri.split('.');
         let fileType = uriParts[uriParts.length - 1];
@@ -70,6 +84,7 @@ export default class FinishProfile extends React.Component {
         return fetch(apiUrl, options);
     }
     render () {
+
         let {image} = this.state;
         return (
             <View style={styles.container}>
